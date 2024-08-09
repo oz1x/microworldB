@@ -20,6 +20,8 @@ VALID_COMMANDS = [
     'U' # Teleport/Open Door/Touch Goal
 ]
 
+POINTS_PER_GOAL = 100
+
 def run_sim(
     the_world, 
     max_turns=None, 
@@ -43,6 +45,10 @@ def run_sim(
     msgB = None
     perceptsA = {}
     perceptsB = {}
+    pointsA = 0
+    pointsB = 0
+    aiA_state = 'GOOD'
+    aiB_state = 'GOOD'
 
     disp = None
 
@@ -72,19 +78,25 @@ def run_sim(
     run = True
     while run:
 
-        write_to_log(
-            log,
-            f"-----Turn: {turn}-----"
-        )
-        if the_aiA is None and the_aiB is None:
+        
+        if aiA_state != 'GOOD' and aiB_state != 'GOOD':
             run = False
             write_to_log(
                 log,
-                f"Both agents are not operative. FAILURE."
+                f"-----Scenario finished-----"
+            )
+            write_to_log(
+                log,
+                f"FINAL AGENT STATES:\nAgent A {aiA_state}\nAgent B {aiB_state}"
             )
             continue
+        else:
+            write_to_log(
+                log,
+                f"-----Turn {turn}-----"
+            )
         
-        if the_aiA is not None:
+        if aiA_state == 'GOOD':
             # What does the agent see?
             perceptsA = get_percepts(the_world, agent_xA, agent_yA, agent_facingA)
             
@@ -138,7 +150,10 @@ def run_sim(
                             log,
                             f"   Trigger:  Agent A has left the environment."
                         )
-                        the_aiA = None
+                        aiA_state = 'EXITED'
+                        agent_xA = None
+                        agent_yA = None
+                        agent_facingA = None
                     case "TELEPORT":
                         write_to_log(
                             log,
@@ -148,21 +163,22 @@ def run_sim(
                         agent_yA = trigger[2]
 
                     case "GOAL_TRIGGERED":
-                        if trigger[1] == 0:
-                            write_to_log(
-                                log,
-                                f"   Trigger:  Agent A activated goal {trigger[2]}"
-                            )
-                            write_to_log(
-                                log,
-                                f"   Trigger:  Your team has completed this map in {turn} turns. SUCCESS"
-                            )
-                            run = False
-                        else:
-                            write_to_log(
-                                log,
-                                f"   Trigger:  Agent A activated goal {trigger[2]}"
-                            )
+                        # if trigger[1] == 0:
+                        #     write_to_log(
+                        #         log,
+                        #         f"   Trigger:  Agent A activated goal {trigger[2]}"
+                        #     )
+                        #     write_to_log(
+                        #         log,
+                        #         f"   Trigger:  Your team has completed this map in {turn} turns. SUCCESS"
+                        #     )
+                        #     run = False
+                        # else:
+                        pointsA += POINTS_PER_GOAL
+                        write_to_log(
+                            log,
+                            f"   Trigger:  Agent A activated goal {trigger[2]}"
+                        )
                     case "NONE":
                         pass
 
@@ -175,9 +191,9 @@ def run_sim(
             else:
                 write_to_log(log, f"Agent A invalid command: {agent_cmdA}")
                 write_to_log(log, "Agent A - FAILURE")
-                the_aiA = None
+                aiA_state = 'BAD'
 
-        if the_aiB is not None:
+        if aiB_state == 'GOOD':
             # What does the agent see?
             perceptsB = get_percepts(the_world, agent_xB, agent_yB, agent_facingB)
 
@@ -230,7 +246,10 @@ def run_sim(
                             log,
                             f"   Trigger:  Agent B has left the environment."
                         )
-                        the_aiB = None
+                        aiB_state = 'EXITED'
+                        agent_xB = None
+                        agent_yB = None
+                        agent_facingB = None
                     case "TELEPORT":
                         write_to_log(
                             log,
@@ -240,21 +259,22 @@ def run_sim(
                         agent_yB = trigger[2]
 
                     case "GOAL_TRIGGERED":
-                        if trigger[1] == 0:
-                            write_to_log(
-                                log,
-                                f"   Trigger:  Agent B activated goal {trigger[2]}"
-                            )
-                            write_to_log(
-                                log,
-                                f"   Trigger:  Your team has completed this map in {turn} turns. SUCCESS"
-                            )
-                            run = False
-                        else:
-                            write_to_log(
-                                log,
-                                f"   Trigger:  Agent B activated goal {trigger[2]}"
-                            )
+                        # if trigger[1] == 0:
+                        #     write_to_log(
+                        #         log,
+                        #         f"   Trigger:  Agent B activated goal {trigger[2]}"
+                        #     )
+                        #     write_to_log(
+                        #         log,
+                        #         f"   Trigger:  Your team has completed this map in {turn} turns. SUCCESS"
+                        #     )
+                        #     run = False
+                        # else:
+                        pointsB += POINTS_PER_GOAL
+                        write_to_log(
+                            log,
+                            f"   Trigger:  Agent B activated goal {trigger[2]}"
+                        )
                     case "NONE":
                         pass
 
@@ -268,7 +288,7 @@ def run_sim(
             else:
                 write_to_log(log, f"Agent B invalid command: {agent_cmdB}")
                 write_to_log(log, "Agent B - FAILURE")
-                the_aiB = None
+                aiB_state = 'BAD'
             
 
         if use_display:
@@ -289,9 +309,31 @@ def run_sim(
                     f"---MAX TURNS REACHED---"
                 )
                 run = False
+                continue
             
         turn += 1
 
+
+    A_points_scored = pointsA if aiA_state == 'EXITED' else 0
+    B_points_scored = pointsB if aiB_state == 'EXITED' else 0
+        
+    write_to_log(
+        log,
+        f"\nFINAL SCORE"
+    )
+    write_to_log(
+        log,
+        f"Agent A {pointsA} found and {A_points_scored} scored."
+    )
+    write_to_log(
+        log,
+        f"Agent B {pointsB} found and {B_points_scored} scored."
+    )
+    write_to_log(
+        log,
+        f"TOTAL: {A_points_scored + B_points_scored}"
+    )
+        
     if use_display:
         disp.quit()
 

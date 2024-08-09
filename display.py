@@ -83,38 +83,48 @@ class Display:
                                 y*self.cell_size + self.cell_size//2 - rect.h//2
                             )
                         )
-        cxA = self.agent_xA*self.cell_size + self.cell_size//2
-        cyA = self.agent_yA*self.cell_size + self.cell_size//2
-        cxB = self.agent_xB*self.cell_size + self.cell_size//2
-        cyB = self.agent_yB*self.cell_size + self.cell_size//2
-        pygame.draw.circle(
-            self.screen,
-            self.agent_color,
-            (cxA, cyA),
-            self.agent_size
-        )
-        pygame.draw.circle(
-            self.screen,
-            self.agent_color,
-            (cxB, cyB),
-            self.agent_size
-        )
-        surfaceA, rectA = self.font.render('A')
-        surfaceB, rectB = self.font.render('B')
-        self.screen.blit(
-            surfaceA,
-            (
-                cxA-rectA.w//2,
-                cyA-rectA.h//2
+
+        if self.agent_xA is not None:
+            cxA = self.agent_xA*self.cell_size + self.cell_size//2
+            cyA = self.agent_yA*self.cell_size + self.cell_size//2
+
+            pygame.draw.circle(
+                self.screen,
+                self.agent_color,
+                (cxA, cyA),
+                self.agent_size
             )
-        )
-        self.screen.blit(
-            surfaceB,
-            (
-                cxB-rectB.w//2,
-                cyB-rectB.w//2
+
+            surfaceA, rectA = self.font.render('A')
+
+            self.screen.blit(
+                surfaceA,
+                (
+                    cxA-rectA.w//2,
+                    cyA-rectA.h//2
+                )
             )
-        )
+            
+        if self.agent_xB is not None:
+            cxB = self.agent_xB*self.cell_size + self.cell_size//2
+            cyB = self.agent_yB*self.cell_size + self.cell_size//2
+        
+            pygame.draw.circle(
+                self.screen,
+                self.agent_color,
+                (cxB, cyB),
+                self.agent_size
+            )
+        
+            surfaceB, rectB = self.font.render('B')
+        
+            self.screen.blit(
+                surfaceB,
+                (
+                    cxB-rectB.w//2,
+                    cyB-rectB.w//2
+                )
+            )
 
         # fx = cxA
         # fy = cyA

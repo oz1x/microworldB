@@ -11,7 +11,7 @@ class World:
     ]
 
     # Cells that are treated as walls.
-    WALL_CELLS = ['w', 'p']
+    WALL_CELLS = ['w']
 
     # Goal Cells
     GOAL_CELLS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']

@@ -45,7 +45,10 @@ class AI:
         """
         self.turn += 1
 
-        print(f"Agent A received {msg}")
-      
-        return random.choice(['N', 'S', 'E', 'W']), "Hello from A"
+
+        match percepts['X'][0]:
+            case '0' | '1' | 'r' | 'b':
+                return 'U', None
+            case _:
+                return random.choice(['N', 'S', 'E', 'W']), None
     
