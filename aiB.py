@@ -44,10 +44,12 @@ class AI:
         The same goes for goal hexes (0, 1, 2, 3, 4, 5, 6, 7, 8, 9).
         """
 
+        print(f"B received the message: {msg}")
+
         self.turn += 1
 
         match percepts['X'][0]:
             case '0' | '1' | 'r' | 'b':
                 return 'U', None
             case _:
-                return random.choice(['N', 'S', 'E', 'W']), None    
+                return random.choice(['N', 'S', 'E', 'W']), "B moving"    

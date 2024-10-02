@@ -45,10 +45,11 @@ class AI:
         """
         self.turn += 1
 
+        print(f"A received the message: {msg}")
 
         match percepts['X'][0]:
             case '0' | '1' | 'r' | 'b':
                 return 'U', None
             case _:
-                return random.choice(['N', 'S', 'E', 'W']), None
+                return random.choice(['N', 'S', 'E', 'W']), "A moving"
     

@@ -20,7 +20,6 @@ VALID_COMMANDS = [
     'U' # Teleport/Open Door/Touch Goal
 ]
 
-POINTS_PER_GOAL = 100
 
 def run_sim(
     the_world, 
@@ -30,6 +29,10 @@ def run_sim(
     display_speed=0.5
 ):
 
+    POINTS_PER_GOAL = 0
+    if max_turns is not None:
+        POINTS_PER_GOAL = max_turns
+    
     the_aiA = aiA.AI()
     the_aiB = aiB.AI()
 
@@ -97,6 +100,8 @@ def run_sim(
             )
         
         if aiA_state == 'GOOD':
+            pointsA += 1
+            
             # What does the agent see?
             perceptsA = get_percepts(the_world, agent_xA, agent_yA, agent_facingA)
             
@@ -194,6 +199,8 @@ def run_sim(
                 aiA_state = 'BAD'
 
         if aiB_state == 'GOOD':
+            pointsB += 1
+            
             # What does the agent see?
             perceptsB = get_percepts(the_world, agent_xB, agent_yB, agent_facingB)
 
@@ -323,11 +330,11 @@ def run_sim(
     )
     write_to_log(
         log,
-        f"Agent A {pointsA} found and {A_points_scored} scored."
+        f"Agent A received {pointsA} points and scored {A_points_scored} points."
     )
     write_to_log(
         log,
-        f"Agent B {pointsB} found and {B_points_scored} scored."
+        f"Agent B received {pointsB} points and scored {B_points_scored} points."
     )
     write_to_log(
         log,
