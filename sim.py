@@ -33,8 +33,8 @@ def run_sim(
     if max_turns is not None:
         POINTS_PER_GOAL = max_turns
     
-    the_aiA = aiA.AI()
-    the_aiB = aiB.AI()
+    the_aiA = aiA.AI(max_turns)
+    the_aiB = aiB.AI(max_turns)
 
     agent_xA, agent_yA = the_world.get_startxyA()
     agent_xB, agent_yB = the_world.get_startxyB()

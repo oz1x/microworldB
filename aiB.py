@@ -12,7 +12,7 @@ import random
 
 
 class AI:
-    def __init__(self):
+    def __init__(self, max_turns):
         """
         Called once before the sim starts. You may use this function
         to initialize any data or data structures you need.
