@@ -56,37 +56,13 @@ class AI:
 
             self.memory = msg[0]
 
-        for i in range(len(self.memory[0])):
-            for h in range(len(self.memory)):
-                print(self.memory[h][i].typeOfTile,end='')
-            print()
+        
 
             
 
 
         if (self.memory[self.xPos][self.yPos].isVisited() == 0):
             self.memory[self.xPos][self.yPos].setVisited()     
-
-        if self.doneWithGoals == True and self.foundGoal == True:
-            if percepts.get('X')[0] == 'r':
-                return ('U', None)
-            choice = self.opposites[self.exitPath.pop()]
-            return (choice, None)
-
-
-        if percepts.get('X')[0] in  ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'):
-            self.turnsSinceGoal = 0
-            return ('U', None)
-        elif percepts.get('X')[0] == 'r':
-            self.foundGoal = True
-            self.goalXPos = self.xPos
-            self.goalYPos = self.yPos
-            if self.doneWithGoals == True:
-                return ('U', None)
-        elif self.turnsSinceGoal > 150:
-            self.doneWithGoals = True
-            self.turnsSinceGoal = -999
-
 
         #mapping function -- complete?
         for direction, path in percepts.items():
@@ -138,7 +114,35 @@ class AI:
                     tilesOut+=1
             i = 1
 
+        for i in range(len(self.memory[0])):
+            for h in range(len(self.memory)):
+                if h == self.xPos and i == self.yPos:
+                    print("#", end='')
+                else:
+                    print(self.memory[h][i].typeOfTile,end='')
+            print()
+
         shortestPath = 999
+
+        if self.doneWithGoals == True and self.foundGoal == True:
+            if percepts.get('X')[0] == 'r':
+                return ('U', None)
+            choice = self.opposites[self.exitPath.pop()]
+            return (choice, None)
+
+
+        if percepts.get('X')[0] in  ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'):
+            self.turnsSinceGoal = 0
+            return ('U', None)
+        elif percepts.get('X')[0] == 'r':
+            self.foundGoal = True
+            self.goalXPos = self.xPos
+            self.goalYPos = self.yPos
+            if self.doneWithGoals == True:
+                return ('U', None)
+        elif self.turnsSinceGoal > 150:
+            self.doneWithGoals = True
+            self.turnsSinceGoal = -999
 
         #choice function
         choice = 'x'
