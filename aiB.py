@@ -15,7 +15,7 @@ class AI:
 
     class TileObj:
 
-        def __init__(self, tileType='w'):
+        def __init__(self, tileType='@'):
             self.typeOfTile = tileType
             self.visited = 0
 

@@ -15,7 +15,7 @@ class AI:
 
     class TileObj:
 
-        def __init__(self, tileType='w'):
+        def __init__(self, tileType='@'):
             self.typeOfTile = tileType
             self.visited = 0
 
@@ -56,10 +56,12 @@ class AI:
 
             self.memory = msg[0]
 
-        for i in self.memory:
-            for h in i:
-                print(h.typeOfTile, end='')
+        for i in range(len(self.memory[0])):
+            for h in range(len(self.memory)):
+                print(self.memory[h][i].typeOfTile,end='')
             print()
+
+            
 
 
         if (self.memory[self.xPos][self.yPos].isVisited() == 0):
