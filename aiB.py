@@ -52,6 +52,8 @@ class AI:
             self.memory[self.xPos][self.yPos].setVisited()
 
         if self.doneWithGoals == True and self.foundGoal == True:
+            if percepts.get('X')[0] == 'r':
+                return ('U', None)
             choice = self.opposites[self.exitPath.pop()]
             return (choice, None)
 
@@ -134,6 +136,8 @@ class AI:
                         self.yPos -= 1
                         self.backTrackStack.append(choice)
                         self.previousChoice = choice
+                        if self.foundGoal == True:
+                            self.exitPath.append(choice)
                         return (choice, None)
                     elif self.memory[self.xPos][self.yPos-i].typeOfTile == 'r':
                         if self.doneWithGoals == True:
@@ -141,6 +145,8 @@ class AI:
                             self.yPos -= 1
                             self.backTrackStack.append(choice)
                             self.previousChoice = choice
+                            if self.foundGoal == True:
+                                self.exitPath.append(choice)
                             return (choice, None)
                     if self.memory[self.xPos][self.yPos-i].isVisited() == 0:
                         numTilesInPath += 1
@@ -159,6 +165,8 @@ class AI:
                         self.xPos += 1
                         self.backTrackStack.append(choice)
                         self.previousChoice = choice
+                        if self.foundGoal == True:
+                            self.exitPath.append(choice)
                         return (choice, None)
                     elif self.memory[self.xPos][self.yPos-i].typeOfTile == 'r':
                         if self.doneWithGoals == True:
@@ -166,6 +174,8 @@ class AI:
                             self.xPos += 1
                             self.backTrackStack.append(choice)
                             self.previousChoice = choice
+                            if self.foundGoal == True:
+                                self.exitPath.append(choice)
                             return (choice, None)
                     if self.memory[self.xPos+i][self.yPos].isVisited() == 0:
                         numTilesInPath += 1
@@ -184,6 +194,8 @@ class AI:
                         self.yPos += 1
                         self.backTrackStack.append(choice)
                         self.previousChoice = choice
+                        if self.foundGoal == True:
+                            self.exitPath.append(choice)
                         return (choice, None)
                     elif self.memory[self.xPos][self.yPos-i].typeOfTile == 'r':
                         if self.doneWithGoals == True:
@@ -191,6 +203,8 @@ class AI:
                             self.yPos += 1
                             self.backTrackStack.append(choice)
                             self.previousChoice = choice
+                            if self.foundGoal == True:
+                                self.exitPath.append(choice)
                             return (choice, None)
                     if self.memory[self.xPos][self.yPos+i].isVisited() == 0:
                         numTilesInPath += 1
@@ -209,6 +223,8 @@ class AI:
                         self.xPos -= 1
                         self.backTrackStack.append(choice)
                         self.previousChoice = choice
+                        if self.foundGoal == True:
+                            self.exitPath.append(choice)
                         return (choice, None)
                     elif self.memory[self.xPos][self.yPos-i].typeOfTile == 'r':
                         if self.doneWithGoals == True:
@@ -216,6 +232,8 @@ class AI:
                             self.xPos -= 1
                             self.backTrackStack.append(choice)
                             self.previousChoice = choice
+                            if self.foundGoal == True:
+                                self.exitPath.append(choice)
                             return (choice, None)
                     if self.memory[self.xPos-i][self.yPos].isVisited() == 0:
                         numTilesInPath += 1
@@ -226,6 +244,8 @@ class AI:
                     self.xPos -= 1
                     self.backTrackStack.append(choice)
                     self.previousChoice = choice
+                    if self.foundGoal == True:
+                            self.exitPath.append(choice)
                     return (choice, None)
 
                 
@@ -260,7 +280,8 @@ class AI:
                 self.yPos += 1
             if choice == 'W':
                 self.xPos -= 1
-
+            if self.foundGoal == True:
+                self.exitPath.append(choice)
             return (choice, None)
         
         self.backTrackStack.append(choice)
