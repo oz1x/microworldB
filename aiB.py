@@ -46,6 +46,14 @@ class AI:
 
     def update(self, percepts, msg):
 
+        if msg is not None:
+            if len(self.memory[0]) < len(msg[0][0]):
+                self.yPos += 1
+            elif len(self.memory) < len(msg[0]):
+                self.xPos += 1
+
+            self.memory = msg[0]
+
         print(self.memory[self.xPos][self.yPos])
 
         if (self.memory[self.xPos][self.yPos].isVisited() == 0):
@@ -64,7 +72,7 @@ class AI:
             self.foundGoal = True
             if self.doneWithGoals == True:
                 return ('U', None)
-        elif self.turnsSinceGoal > 200:
+        elif self.turnsSinceGoal > 150:
             self.doneWithGoals = True
             self.turnsSinceGoal = -999
 
@@ -293,5 +301,5 @@ class AI:
         if self.foundGoal == True:
             self.exitPath.append(choice)
 
-        return (choice, None)
+        return (choice, (self.memory, choice))
     

@@ -46,7 +46,21 @@ class AI:
 
     def update(self, percepts, msg):
 
-        print(self.memory[self.xPos][self.yPos])
+
+
+        if msg is not None :
+            if len(self.memory[0]) < len(msg[0][0]):
+                self.yPos += 1
+            elif len(self.memory) < len(msg[0]):
+                self.xPos += 1
+
+            self.memory = msg[0]
+
+        for i in self.memory:
+            for h in i:
+                print(h.typeOfTile, end='')
+            print()
+
 
         if (self.memory[self.xPos][self.yPos].isVisited() == 0):
             self.memory[self.xPos][self.yPos].setVisited()     
@@ -67,7 +81,7 @@ class AI:
             self.goalYPos = self.yPos
             if self.doneWithGoals == True:
                 return ('U', None)
-        elif self.turnsSinceGoal > 200:
+        elif self.turnsSinceGoal > 150:
             self.doneWithGoals = True
             self.turnsSinceGoal = -999
 
@@ -297,5 +311,5 @@ class AI:
         if self.foundGoal == True:
             self.exitPath.append(choice)
 
-        return (choice, None)
+        return (choice, (self.memory, choice))
     
