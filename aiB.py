@@ -58,6 +58,8 @@ class AI:
             shortestPath = 999
             lenSP = 999
             while self.memory[tempX][tempY].typeOfTile != 'r':
+                shortestPath = 999
+                lenSP = 999
                 for direction in percepts:
                     if direction == 'X':
                         choice = 'x'
@@ -71,7 +73,7 @@ class AI:
                         while self.memory[tempX][tempY-i].typeOfTile != 'w':
                             if self.memory[tempX][tempY-i].typeOfTile == 'r':
                                 choice = direction
-                                #return choice
+                                return choice
                             if self.memory[tempX][tempY-i].isVisited() == 1:
                                 self.memory[tempX][tempY-i].visited = 0
                                 numTilesInPath += 1
@@ -81,8 +83,8 @@ class AI:
                             i += 1
                             lenPath += 1
 
-                        if lenPath < lenSP and numTilesInPath > 0:
-                            print("Nenis")
+                        if numTilesInPath < shortestPath and numTilesInPath > 0:
+                            shortestPath = numTilesInPath
                             lenSP = lenPath
                             choice = direction
         
@@ -93,7 +95,7 @@ class AI:
                         while self.memory[tempX+i][tempY].typeOfTile != 'w':
                             if self.memory[tempX+i][tempY].typeOfTile == 'r':
                                 choice = direction
-                                #return choice
+                                return choice
                             if self.memory[tempX+i][tempY].isVisited() == 1:
                                 self.memory[tempX+i][tempY].visited = 0
                                 numTilesInPath += 1
@@ -102,8 +104,8 @@ class AI:
                             i += 1
                             lenPath += 1
 
-                        if lenPath < lenSP and numTilesInPath > 0:
-                            print("Eenis")
+                        if numTilesInPath < shortestPath and numTilesInPath > 0:
+                            shortestPath = numTilesInPath
                             lenSP = lenPath
                             choice = direction
 
@@ -114,7 +116,7 @@ class AI:
                         while self.memory[tempX][tempY+i].typeOfTile != 'w':
                             if self.memory[tempX][tempY+i].typeOfTile == 'r':
                                 choice = direction
-                                #return choice
+                                return choice
                             if self.memory[tempX][tempY+i].isVisited() == 1:
                                 self.memory[tempX][tempY+i].visited = 0
                                 numTilesInPath += 1
@@ -123,8 +125,8 @@ class AI:
                             i += 1
                             lenPath += 1
 
-                        if lenPath < lenSP and numTilesInPath > 0:
-                            print("Senis")
+                        if numTilesInPath < shortestPath and numTilesInPath > 0:
+                            shortestPath = numTilesInPath
                             lenSP = lenPath
                             choice = direction
                     
@@ -135,7 +137,7 @@ class AI:
                         while self.memory[tempX-i][tempY].typeOfTile != 'w':
                             if self.memory[tempX-i][tempY].typeOfTile == 'r':
                                 choice = direction
-                                #return choice
+                                return choice
                             if self.memory[tempX-i][tempY].isVisited() == 1:
                                 self.memory[tempX-i][tempY].visited = 0
                                 numTilesInPath += 1
@@ -144,14 +146,13 @@ class AI:
                             i += 1
                             lenPath += 1
 
-                        if lenPath < lenSP and numTilesInPath > 0:
-                            print("Wenis")
+                        if numTilesInPath < shortestPath and numTilesInPath > 0:
+                            shortestPath = numTilesInPath
                             lenSP = lenPath
                             choice = direction
 
                 if choice != 'x':
                     for i in range(lenSP):
-                        print(lenSP)
                         print("adding " + str(i) +"st item to list")
                         pathToExit.append(choice)
                         if choice == 'N':
@@ -249,8 +250,15 @@ class AI:
 
         shortestPath = 999
         message = None
-
-
+        print("B MAP:")
+        
+        for j in range(len(self.memory[0])):
+            for h in range(len(self.memory)):
+                if h == self.xPos and j == self.yPos:
+                    print("#", end='')
+                else:
+                    print(self.memory[h][j].typeOfTile,end='')
+            print()
 
         if percepts.get('X')[0] in  ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'):
             self.turnsSinceGoal = 0
