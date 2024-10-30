@@ -71,7 +71,7 @@ class AI:
                         while self.memory[tempX][tempY-i].typeOfTile != 'w':
                             if self.memory[tempX][tempY-i].typeOfTile == 'r':
                                 choice = direction
-                                return choice
+                                #return choice
                             if self.memory[tempX][tempY-i].isVisited() == 1:
                                 numTilesInPath += 1
                             
@@ -80,8 +80,8 @@ class AI:
                             i += 1
                             lenPath += 1
 
-                        if numTilesInPath < shortestPath and numTilesInPath > 0:
-                            shortestPath = numTilesInPath
+                        if lenPath < lenSP and numTilesInPath > 0:
+                            print("Nenis")
                             lenSP = lenPath
                             choice = direction
         
@@ -92,7 +92,7 @@ class AI:
                         while self.memory[tempX+i][tempY].typeOfTile != 'w':
                             if self.memory[tempX+i][tempY].typeOfTile == 'r':
                                 choice = direction
-                                return choice
+                                #return choice
                             if self.memory[tempX+i][tempY].isVisited() == 1:
                                 numTilesInPath += 1
                             #else:
@@ -100,8 +100,8 @@ class AI:
                             i += 1
                             lenPath += 1
 
-                        if numTilesInPath < shortestPath and numTilesInPath > 0:
-                            shortestPath = numTilesInPath
+                        if lenPath < lenSP and numTilesInPath > 0:
+                            print("Eenis")
                             lenSP = lenPath
                             choice = direction
 
@@ -112,7 +112,7 @@ class AI:
                         while self.memory[tempX][tempY+i].typeOfTile != 'w':
                             if self.memory[tempX][tempY+i].typeOfTile == 'r':
                                 choice = direction
-                                return choice
+                                #return choice
                             if self.memory[tempX][tempY+i].isVisited() == 1:
                                 numTilesInPath += 1
                             #else:
@@ -120,8 +120,8 @@ class AI:
                             i += 1
                             lenPath += 1
 
-                        if numTilesInPath < shortestPath and numTilesInPath > 0:
-                            shortestPath = numTilesInPath
+                        if lenPath < lenSP and numTilesInPath > 0:
+                            print("Senis")
                             lenSP = lenPath
                             choice = direction
                     
@@ -132,7 +132,7 @@ class AI:
                         while self.memory[tempX-i][tempY].typeOfTile != 'w':
                             if self.memory[tempX-i][tempY].typeOfTile == 'r':
                                 choice = direction
-                                return choice
+                                #return choice
                             if self.memory[tempX-i][tempY].isVisited() == 1:
                                 numTilesInPath += 1
                             #else:
@@ -140,13 +140,14 @@ class AI:
                             i += 1
                             lenPath += 1
 
-                        if numTilesInPath < shortestPath and numTilesInPath > 0:
-                            shortestPath = numTilesInPath
+                        if lenPath < lenSP and numTilesInPath > 0:
+                            print("Wenis")
                             lenSP = lenPath
                             choice = direction
 
                 if choice != 'x':
                     for i in range(lenSP):
+                        print(lenSP)
                         print("adding " + str(i) +"st item to list")
                         pathToExit.append(choice)
                         if choice == 'N':

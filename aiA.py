@@ -147,6 +147,8 @@ class AI:
 
                 if choice != 'x':
                     for i in range(lenSP):
+                        print(lenSP)
+                        print("adding " + str(i) +"st item to list")
                         pathToExit.append(choice)
                         if choice == 'N':
                             tempY -= 1
