@@ -73,6 +73,7 @@ class AI:
                                 choice = direction
                                 #return choice
                             if self.memory[tempX][tempY-i].isVisited() == 1:
+                                self.memory[tempX][tempY-i].visited = 0
                                 numTilesInPath += 1
                             
                             #else:
@@ -94,6 +95,7 @@ class AI:
                                 choice = direction
                                 #return choice
                             if self.memory[tempX+i][tempY].isVisited() == 1:
+                                self.memory[tempX+i][tempY].visited = 0
                                 numTilesInPath += 1
                             #else:
                             #    numTilesInPath = -999
@@ -114,6 +116,7 @@ class AI:
                                 choice = direction
                                 #return choice
                             if self.memory[tempX][tempY+i].isVisited() == 1:
+                                self.memory[tempX][tempY+i].visited = 0
                                 numTilesInPath += 1
                             #else:
                             #    numTilesInPath = -999
@@ -134,6 +137,7 @@ class AI:
                                 choice = direction
                                 #return choice
                             if self.memory[tempX-i][tempY].isVisited() == 1:
+                                self.memory[tempX-i][tempY].visited = 0
                                 numTilesInPath += 1
                             #else:
                             #   numTilesInPath = -999
