@@ -99,9 +99,9 @@ class AI:
 
                 if tempMap[tempLayer][x][y].typeOfTile in ('y', 'p', 'o', 'b') and (path[-1] != 'U'):
                     try:
-                        tempLayer = self.layerTile[self.layerTile.index(tempMap[tempLayer][x][y].typeOfTile)+1]
+                        tempLayer = self.layerTile[self.memoryLayer][self.layerTile[self.memoryLayer].index(tempMap[tempLayer][x][y].typeOfTile)+1]
                     except:
-                        tempLayer = self.layerTile[self.layerTile.index(self.opposites[tempMap[tempLayer][x][y].typeOfTile])+1]
+                        tempLayer = self.layerTile[self.memoryLayer][self.layerTile[self.memoryLayer].index(self.opposites[tempMap[tempLayer][x][y].typeOfTile])+1]
                     queue.append((self.xPos[tempLayer], self.yPos[tempLayer], path + ['U']))
                 else:   
                     # Explore neighboring tiles in all directions
@@ -248,20 +248,21 @@ class AI:
         elif percepts.get('X')[0] in ('y', 'p', 'o', 'b') and (self.previousChoice != 'U'):
             print("TELEPORTER TIMEEEEEEE")
             self.previousChoice = 'U'
-            if (percepts.get('X')[0] not in self.layerTile) and (self.opposites[percepts.get('X')[0]] not in self.layerTile):   
-                self.layerTile.append(percepts.get('X')[0])
-                self.layerTile.append(len(self.memory))
+            if (percepts.get('X')[0] not in self.layerTile[self.memoryLayer]) and (self.opposites[percepts.get('X')[0]] not in self.layerTile[self.memoryLayer]):   
+                self.layerTile[self.memoryLayer].append(percepts.get('X')[0])
+                self.layerTile[self.memoryLayer].append(len(self.memory))
+                self.layerTile.append([])
                 self.memory.append([[self.TileObj()]])
-                self.memoryLayer = self.layerTile[self.layerTile.index(percepts.get('X')[0])+1]
+                self.memoryLayer = self.layerTile[self.memoryLayer][self.layerTile[self.memoryLayer].index(percepts.get('X')[0])+1]
                 self.xPos.append(0)
                 self.yPos.append(0)
                 return ('U', message)
             else:
                 if (self.memory[0][self.xPos[0]][self.yPos[0]].isVisited() == 0) or (self.memory[0][self.xPos[0]][self.yPos[0]].typeOfTile == self.opposites[percepts.get('X')[0]]):
                     try:
-                        self.memoryLayer = self.layerTile[self.layerTile.index(percepts.get('X')[0])+1]
+                        self.memoryLayer = self.layerTile[self.memoryLayer][self.layerTile[self.memoryLayer].index(percepts.get('X')[0])+1]
                     except:
-                        self.memoryLayer = self.layerTile[self.layerTile.index(self.opposites[percepts.get('X')[0]])+1]
+                        self.memoryLayer = self.layerTile[self.memoryLayer][self.layerTile[self.memoryLayer].index(self.opposites[percepts.get('X')[0]])+1]
                     return ('U', message)
         elif percepts.get('X')[0] == 'r':
             self.foundGoal = True
