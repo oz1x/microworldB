@@ -27,7 +27,7 @@ class AI:
         
     
     def __init__(self, max_turns):
-        self.turn = -1
+        self.turn = 0
         self.previousChoice = 'X'
         self.memory = [[self.TileObj()]]
         self.xPos = 0
@@ -47,9 +47,12 @@ class AI:
         self.opposites = {'N': 'S', 'S': 'N', 'E': 'W', 'W':'E', 'X': 'Y'}
 
     def update(self, percepts, msg):
-
+        self.turn += 1
         message = None
-    
+        if self.turn == 900:
+            self.doneWithGoals = True
+
+
         def genExitPath(self):
             print("\n\nINITIATING EXIT PATH GENERATION\n\n")
             numRuns = 1
@@ -99,7 +102,9 @@ class AI:
                         while tempMap[tempX+i][tempY].typeOfTile != 'w' and tempMap[tempX+i][tempY].typeOfTile != '@' :
                             if tempMap[tempX+i][tempY].typeOfTile == 'r':
                                 for x in range(i):
+                                    print("FOUND EXIT " + str(i) + " TILES EAST, ADDING TO LIST!")
                                     pathToExit.append('E')
+                                pathToExit.append('U')
                                 return pathToExit
                             if tempMap[tempX+i][tempY].visited == 0:
                                 lenPath += 1
@@ -116,7 +121,9 @@ class AI:
                         while tempMap[tempX][tempY+i].typeOfTile != 'w' and tempMap[tempX][tempY+i].typeOfTile != '@' :
                             if tempMap[tempX][tempY+i].typeOfTile == 'r':
                                 for x in range(i):
+                                    print("FOUND EXIT " + str(i) + " TILES SOUTH, ADDING TO LIST!")
                                     pathToExit.append('S')
+                                pathToExit.append('U')
                                 return pathToExit
                             if tempMap[tempX][tempY+i].visited == 0:
                                 lenPath += 1
@@ -133,7 +140,9 @@ class AI:
                         while tempMap[tempX-i][tempY].typeOfTile != 'w' and tempMap[tempX-i][tempY].typeOfTile != '@' :
                             if tempMap[tempX-i][tempY].typeOfTile == 'r':
                                 for x in range(i):
+                                    print("FOUND EXIT " + str(i) + " TILES WEST, ADDING TO LIST!")
                                     pathToExit.append('W')
+                                pathToExit.append('U')
                                 return pathToExit
                             if tempMap[tempX-i][tempY].visited == 0:
                                 lenPath += 1
@@ -167,7 +176,7 @@ class AI:
                         if choice == 'W':
                             tempX -= 1
 
-                print("A iter "+ str(numRuns) + ", choice: " + choice)
+                print("B iter "+ str(numRuns) + ", choice: " + choice)
                 print(pathToExit)
                 for j in range(len(tempMap[0])):
                     for h in range(len(tempMap)):
@@ -185,13 +194,13 @@ class AI:
                 print("could not find path to exit.")
             return pathToExit
 
-        #if msg is not None:
-        #    if len(self.memory[0]) < len(msg[0][0]):
-        #        self.yPos += 1
-        #    elif len(self.memory) < len(msg[0]):
-        #        self.xPos += 1
-
-        #    self.memory = msg[0]
+        if msg is not None :
+            if len(self.memory[0]) < len(msg[0][0]):
+                self.yPos += (len(msg[0][0]) - len(self.memory[0]))
+            elif len(self.memory) < len(msg[0]):
+                self.xPos += (len(msg[0]) - len(self.memory))
+        
+            self.memory = msg[0]
 
 
         if (self.memory[self.xPos][self.yPos].isVisited() == 0):
@@ -248,13 +257,15 @@ class AI:
             i = 1
 
         shortestPath = 999
-        message = None
+        message = (self.memory, self.previousChoice)
         print("B MAP:")
         
         for j in range(len(self.memory[0])):
             for h in range(len(self.memory)):
                 if h == self.xPos and j == self.yPos:
                     print("#", end='')
+                elif self.memory[h][j].typeOfTile == 'g':
+                    print(' ', end='')
                 else:
                     print(self.memory[h][j].typeOfTile,end='')
             print()
@@ -263,7 +274,7 @@ class AI:
             self.pathToExit = genExitPath(self)
             self.exitPathGenerated = True
 
-        elif self.doneWithGoals and self.exitPathGenerated:
+        if self.doneWithGoals and self.exitPathGenerated:
             if percepts.get('X')[0] == 'r':
                 return ('U', message)
             return (self.pathToExit.pop(0), message)
@@ -400,7 +411,6 @@ class AI:
 
         self.previousChoice = choice
         self.turnsSinceGoal += 1
-
 
         return (choice, message)
     

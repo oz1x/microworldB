@@ -27,7 +27,7 @@ class AI:
         
     
     def __init__(self, max_turns):
-        self.turn = -1
+        self.turn = 0
         self.previousChoice = 'X'
         self.memory = [[self.TileObj()]]
         self.xPos = 0
@@ -47,8 +47,12 @@ class AI:
         self.opposites = {'N': 'S', 'S': 'N', 'E': 'W', 'W':'E', 'X': 'Y'}     
 
     def update(self, percepts, msg):
-
+        self.turn += 1
         message = None
+        print("TURN " + str(self.turn))
+        if self.turn == 900:
+            print("Last plane out of Saigon!")
+            self.doneWithGoals = True
 
         def genExitPath(self):
             print("\n\nINITIATING EXIT PATH GENERATION\n\n")
@@ -78,8 +82,11 @@ class AI:
                         numTilesInPath = 0
                         while tempMap[tempX][tempY-i].typeOfTile != 'w' and tempMap[tempX][tempY-i].typeOfTile != '@' :
                             if tempMap[tempX][tempY-i].typeOfTile == 'r':
+                                print("YAHOO!! found exit " + str(i) + " tiles away, adding to list and bouncing.")
                                 for x in range(i):
                                     pathToExit.append('N')
+                                pathToExit.append('U')
+                                print("Length of exit path: " + str(len(pathToExit)))
                                 return pathToExit
                             
                             if tempMap[tempX][tempY-i].visited == 0:
@@ -184,13 +191,13 @@ class AI:
             return pathToExit
 
 
-        #if msg is not None :
-        #    if len(self.memory[0]) < len(msg[0][0]):
-        #        self.yPos += 1
-        #    elif len(self.memory) < len(msg[0]):
-        #        self.xPos += 1
-        #
-        #    self.memory = msg[0]
+        if msg is not None :
+            if len(self.memory[0]) < len(msg[0][0]):
+                self.yPos += (len(msg[0][0]) - len(memory[0]))
+            elif len(self.memory) < len(msg[0]):
+                self.xPos += (len(msg[0]) - len(self.memory))
+        
+            self.memory = msg[0]
 
         
 
@@ -261,13 +268,13 @@ class AI:
             print()
 
         shortestPath = 999
-        message = None
+        message = (self.memory, self.previousChoice)
 
         if self.doneWithGoals and self.foundGoal and not self.exitPathGenerated:
             self.pathToExit = genExitPath(self)
             self.exitPathGenerated = True
 
-        elif self.doneWithGoals and self.exitPathGenerated:
+        if self.doneWithGoals and self.exitPathGenerated:
             if percepts.get('X')[0] == 'r':
                 return ('U', message)
             return (self.pathToExit.pop(0), message)
