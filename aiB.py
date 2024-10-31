@@ -7,9 +7,9 @@
 #
 #     In-code comments DO NOT count as a description of
 #     of your approach.
-
+MAX_TURNS = 150
 import random
-
+from collections import deque
 
 class AI:
 
@@ -55,152 +55,71 @@ class AI:
 
         def genExitPath(self):
             print("\n\nINITIATING EXIT PATH GENERATION\n\n")
-            numRuns = 1
             pathToExit = []
             tempMap = self.memory
+
+            # Initialize visited status for each tile
             for sublist in tempMap:
                 for tile in sublist:
-                    tile.visited = 0
-            tempX = self.xPos
-            tempY = self.yPos
-            shortestPath = 999
-            lenSP = 999
-            while tempMap[tempX][tempY].typeOfTile != 'r':
+                    tile.visited = False
 
-                tempMap[tempX][tempY].visited = 1
-                lenSP = 999
-                for direction in percepts:
-                    if direction == 'X':
-                        choice = 'x'
-                        continue
-                    
-                    numTilesInPath = 0
-                    if direction == 'N':
-                        lenPath = 0
-                        i = 1
-                        numTilesInPath = 0
-                        while tempMap[tempX][tempY-i].typeOfTile != 'w' and tempMap[tempX][tempY-i].typeOfTile != '@' :
-                            if tempMap[tempX][tempY-i].typeOfTile == 'r':
-                                for x in range(i):
-                                    print("FOUND EXIT " + str(i) + " TILES NORTH, ADDING TO LIST!")
-                                    pathToExit.append('N')
-                                pathToExit.append('U')
-                                return pathToExit
-                            
-                            if tempMap[tempX][tempY-i].visited == 0:
-                                lenPath += 1
-                            i += 1
+            startX, startY = self.xPos, self.yPos
+            directions = {'N': (0, -1), 'E': (1, 0), 'S': (0, 1), 'W': (-1, 0)}
+            queue = deque([(startX, startY, [])])  # Store position and path to reach that position
+            tempMap[startX][startY].visited = True
 
-                        if lenPath < lenSP and lenPath > 0:
-                            lenSP = lenPath
-                            choice = direction
+            # Perform BFS
+            while queue:
+                x, y, path = queue.popleft()
 
-                    elif direction == 'E':
-                        lenPath = 0
-                        i = 1
-                        numTilesInPath = 0
-                        while tempMap[tempX+i][tempY].typeOfTile != 'w' and tempMap[tempX+i][tempY].typeOfTile != '@' :
-                            if tempMap[tempX+i][tempY].typeOfTile == 'r':
-                                for x in range(i):
-                                    print("FOUND EXIT " + str(i) + " TILES EAST, ADDING TO LIST!")
-                                    pathToExit.append('E')
-                                pathToExit.append('U')
-                                return pathToExit
-                            if tempMap[tempX+i][tempY].visited == 0:
-                                lenPath += 1
-                            i += 1
-
-                        if lenPath < lenSP and lenPath > 0:
-                            lenSP = lenPath
-                            choice = direction
-
-                    elif direction == 'S':
-                        lenPath = 0
-                        i = 1
-                        numTilesInPath = 0
-                        while tempMap[tempX][tempY+i].typeOfTile != 'w' and tempMap[tempX][tempY+i].typeOfTile != '@' :
-                            if tempMap[tempX][tempY+i].typeOfTile == 'r':
-                                for x in range(i):
-                                    print("FOUND EXIT " + str(i) + " TILES SOUTH, ADDING TO LIST!")
-                                    pathToExit.append('S')
-                                pathToExit.append('U')
-                                return pathToExit
-                            if tempMap[tempX][tempY+i].visited == 0:
-                                lenPath += 1
-                            i += 1
-
-                        if lenPath < lenSP and lenPath > 0:
-                            lenSP = lenPath
-                            choice = direction
-
-                    elif direction == 'W':
-                        lenPath = 0
-                        i = 1
-                        numTilesInPath = 0
-                        while tempMap[tempX-i][tempY].typeOfTile != 'w' and tempMap[tempX-i][tempY].typeOfTile != '@' :
-                            if tempMap[tempX-i][tempY].typeOfTile == 'r':
-                                for x in range(i):
-                                    print("FOUND EXIT " + str(i) + " TILES WEST, ADDING TO LIST!")
-                                    pathToExit.append('W')
-                                pathToExit.append('U')
-                                return pathToExit
-                            if tempMap[tempX-i][tempY].visited == 0:
-                                lenPath += 1
-                            i += 1
-
-                        if lenPath < lenSP and lenPath > 0:
-                            lenSP = lenPath
-                            choice = direction
-
-                if choice != 'x':
-                    for i in range(lenSP):
-                        print("adding " + str(i) +"st item to list")
-                        pathToExit.append(choice)
-                        if choice == 'N':
-                            tempY -= 1
-                        if choice == 'E':
-                            tempX += 1
-                        if choice == 'S':
-                            tempY += 1
-                        if choice == 'W':
-                            tempX -= 1
-                else:
-                    if pathToExit:
-                        choice = self.opposites[pathToExit.pop()]
-                        if choice == 'N':
-                            tempY -= 1
-                        if choice == 'E':
-                            tempX += 1
-                        if choice == 'S':
-                            tempY += 1
-                        if choice == 'W':
-                            tempX -= 1
-
-                print("B iter "+ str(numRuns) + ", choice: " + choice)
-                print(pathToExit)
                 for j in range(len(tempMap[0])):
                     for h in range(len(tempMap)):
-                        if h == tempX and j == tempY:
+                        if h == x and j == y:
                             print("#", end='')
                         elif tempMap[h][j].typeOfTile == 'g':
-                            print(' ', end='')
+                            if tempMap[h][j].visited == 1:
+                                print('█', end='')
+                            else:
+                                print(' ', end='')
                         else:
                             print(tempMap[h][j].typeOfTile,end='')
                     print()
-                numRuns += 1
-            if pathToExit:
-                print("Found path to exit with length " + str(len(pathToExit)))
-            else:
-                print("could not find path to exit.")
-            return pathToExit
 
-        if msg is not None :
-            if len(self.memory[0]) < len(msg[0][0]):
-                self.yPos += (len(msg[0][0]) - len(self.memory[0]))
-            elif len(self.memory) < len(msg[0]):
-                self.xPos += (len(msg[0]) - len(self.memory))
-        
-            self.memory = msg[0]
+                # Check if we've reached the exit
+                if tempMap[x][y].typeOfTile == 'r':
+                    print("FOUND EXIT, RETURNING PATH")
+                    pathToExit = path + ['U']
+                    return pathToExit
+
+                # Explore neighboring tiles in all directions
+                for direction, (dx, dy) in directions.items():
+                    nx, ny = x + dx, y + dy
+
+                    # Check within bounds and for non-wall tiles
+                    if 0 <= nx < len(tempMap) and 0 <= ny < len(tempMap[0]):
+                        if not tempMap[nx][ny].visited and tempMap[nx][ny].typeOfTile not in {'w', '@'}:
+                            # Mark as visited and add to queue with updated path
+                            tempMap[nx][ny].visited = True
+                            queue.append((nx, ny, path + [direction]))
+
+            # If no path is found, return an empty path
+            print("COULD NOT FIND PATH TO EXIT")
+            return []
+
+
+        #if msg is not None :
+
+        #   if self.turn == 1:
+        #        self.memory = msg[0]
+
+        #    else:
+
+        #        if len(self.memory[0]) < len(msg[0][0]):
+        #            self.yPos += (len(msg[0][0]) - len(self.memory[0]))
+        #        if len(self.memory) < len(msg[0]):
+        #            self.xPos += (len(msg[0]) - len(self.memory))
+        #    
+        #        self.memory = msg[0]
 
 
         if (self.memory[self.xPos][self.yPos].isVisited() == 0):
@@ -286,7 +205,7 @@ class AI:
             self.foundGoal = True
             if self.doneWithGoals == True:
                 return ('U', None)
-        elif self.turnsSinceGoal > 150:
+        elif self.turnsSinceGoal > MAX_TURNS:
             self.doneWithGoals = True
             self.turnsSinceGoal = -999
 
