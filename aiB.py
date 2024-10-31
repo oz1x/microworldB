@@ -54,12 +54,17 @@ class AI:
             print("\n\nINITIATING EXIT PATH GENERATION\n\n")
             numRuns = 1
             pathToExit = []
+            tempMap = self.memory
+            for sublist in tempMap:
+                for tile in sublist:
+                    tile.visited = 0
             tempX = self.xPos
             tempY = self.yPos
             shortestPath = 999
             lenSP = 999
-            while self.memory[tempX][tempY].typeOfTile != 'r':
-                shortestPath = 999
+            while tempMap[tempX][tempY].typeOfTile != 'r':
+
+                tempMap[tempX][tempY].visited = 1
                 lenSP = 999
                 for direction in percepts:
                     if direction == 'X':
@@ -71,42 +76,36 @@ class AI:
                         lenPath = 0
                         i = 1
                         numTilesInPath = 0
-                        while self.memory[tempX][tempY-i].typeOfTile != 'w':
-                            if self.memory[tempX][tempY-i].typeOfTile == 'r':
-                                choice = direction
-                                #return choice
-                            if self.memory[tempX][tempY-i].isVisited() == 1:
-                                self.memory[tempX][tempY-i].visited = 0
-                                numTilesInPath += 1
+                        while tempMap[tempX][tempY-i].typeOfTile != 'w' and tempMap[tempX][tempY-i].typeOfTile != '@' :
+                            if tempMap[tempX][tempY-i].typeOfTile == 'r':
+                                for x in range(i):
+                                    print("FOUND EXIT " + str(i) + " TILES NORTH, ADDING TO LIST!")
+                                    pathToExit.append('N')
+                                pathToExit.append('U')
+                                return pathToExit
                             
-                            #else:
-                            #   numTilesInPath = -999
+                            if tempMap[tempX][tempY-i].visited == 0:
+                                lenPath += 1
                             i += 1
-                            lenPath += 1
 
-                        if numTilesInPath < shortestPath and numTilesInPath > 0:
-                            shortestPath = numTilesInPath
+                        if lenPath < lenSP and lenPath > 0:
                             lenSP = lenPath
                             choice = direction
-        
+
                     elif direction == 'E':
                         lenPath = 0
                         i = 1
                         numTilesInPath = 0
-                        while self.memory[tempX+i][tempY].typeOfTile != 'w':
-                            if self.memory[tempX+i][tempY].typeOfTile == 'r':
-                                choice = direction
-                                #return choice
-                            if self.memory[tempX+i][tempY].isVisited() == 1:
-                                self.memory[tempX+i][tempY].visited = 0
-                                numTilesInPath += 1
-                            #else:
-                            #    numTilesInPath = -999
+                        while tempMap[tempX+i][tempY].typeOfTile != 'w' and tempMap[tempX+i][tempY].typeOfTile != '@' :
+                            if tempMap[tempX+i][tempY].typeOfTile == 'r':
+                                for x in range(i):
+                                    pathToExit.append('E')
+                                return pathToExit
+                            if tempMap[tempX+i][tempY].visited == 0:
+                                lenPath += 1
                             i += 1
-                            lenPath += 1
 
-                        if numTilesInPath < shortestPath and numTilesInPath > 0:
-                            shortestPath = numTilesInPath
+                        if lenPath < lenSP and lenPath > 0:
                             lenSP = lenPath
                             choice = direction
 
@@ -114,48 +113,40 @@ class AI:
                         lenPath = 0
                         i = 1
                         numTilesInPath = 0
-                        while self.memory[tempX][tempY+i].typeOfTile != 'w':
-                            if self.memory[tempX][tempY+i].typeOfTile == 'r':
-                                choice = direction
-                                #return choice
-                            if self.memory[tempX][tempY+i].isVisited() == 1:
-                                self.memory[tempX][tempY+i].visited = 0
-                                numTilesInPath += 1
-                            #else:
-                            #    numTilesInPath = -999
+                        while tempMap[tempX][tempY+i].typeOfTile != 'w' and tempMap[tempX][tempY+i].typeOfTile != '@' :
+                            if tempMap[tempX][tempY+i].typeOfTile == 'r':
+                                for x in range(i):
+                                    pathToExit.append('S')
+                                return pathToExit
+                            if tempMap[tempX][tempY+i].visited == 0:
+                                lenPath += 1
                             i += 1
-                            lenPath += 1
 
-                        if numTilesInPath < shortestPath and numTilesInPath > 0:
-                            shortestPath = numTilesInPath
+                        if lenPath < lenSP and lenPath > 0:
                             lenSP = lenPath
                             choice = direction
-                    
+
                     elif direction == 'W':
                         lenPath = 0
                         i = 1
                         numTilesInPath = 0
-                        while self.memory[tempX-i][tempY].typeOfTile != 'w':
-                            if self.memory[tempX-i][tempY].typeOfTile == 'r':
-                                choice = direction
-                                #return choice
-                            if self.memory[tempX-i][tempY].isVisited() == 1:
-                                self.memory[tempX-i][tempY].visited = 0
-                                numTilesInPath += 1
-                            #else:
-                            #   numTilesInPath = -999
+                        while tempMap[tempX-i][tempY].typeOfTile != 'w' and tempMap[tempX-i][tempY].typeOfTile != '@' :
+                            if tempMap[tempX-i][tempY].typeOfTile == 'r':
+                                for x in range(i):
+                                    pathToExit.append('W')
+                                return pathToExit
+                            if tempMap[tempX-i][tempY].visited == 0:
+                                lenPath += 1
                             i += 1
-                            lenPath += 1
 
-                        if numTilesInPath < shortestPath and numTilesInPath > 0:
-                            shortestPath = numTilesInPath
+                        if lenPath < lenSP and lenPath > 0:
                             lenSP = lenPath
                             choice = direction
 
                 if choice != 'x':
                     for i in range(lenSP):
                         print("adding " + str(i) +"st item to list")
-                        self.pathToExit.append(choice)
+                        pathToExit.append(choice)
                         if choice == 'N':
                             tempY -= 1
                         if choice == 'E':
@@ -165,20 +156,33 @@ class AI:
                         if choice == 'W':
                             tempX -= 1
                 else:
+                    if pathToExit:
+                        choice = self.opposites[pathToExit.pop()]
+                        if choice == 'N':
+                            tempY -= 1
+                        if choice == 'E':
+                            tempX += 1
+                        if choice == 'S':
+                            tempY += 1
+                        if choice == 'W':
+                            tempX -= 1
 
-                    self.memory[tempX][tempY].visited = 0
-                    choice = self.opposites[self.pathToExit.pop()]
-                    if choice == 'N':
-                        tempY -= 1
-                    if choice == 'E':
-                        tempX += 1
-                    if choice == 'S':
-                        tempY += 1
-                    if choice == 'W':
-                        tempX -= 1
-
-                print("iter "+ str(numRuns) + ", choice: " + choice)
+                print("A iter "+ str(numRuns) + ", choice: " + choice)
+                print(pathToExit)
+                for j in range(len(tempMap[0])):
+                    for h in range(len(tempMap)):
+                        if h == tempX and j == tempY:
+                            print("#", end='')
+                        elif tempMap[h][j].typeOfTile == 'g':
+                            print(' ', end='')
+                        else:
+                            print(tempMap[h][j].typeOfTile,end='')
+                    print()
                 numRuns += 1
+            if pathToExit:
+                print("Found path to exit with length " + str(len(pathToExit)))
+            else:
+                print("could not find path to exit.")
             return pathToExit
 
         #if msg is not None:
@@ -189,15 +193,6 @@ class AI:
 
         #    self.memory = msg[0]
 
-        if self.doneWithGoals and not self.exitPathGenerated:
-            self.pathToExit = genExitPath(self)
-            self.exitPathGenerated = True
-
-        elif self.doneWithGoals and self.exitPathGenerated:
-            print(self.pathToExit)
-            if percepts.get('X')[0] == 'r':
-                return ('u', message)
-            return (self.pathToExit.pop(0), message)
 
         if (self.memory[self.xPos][self.yPos].isVisited() == 0):
             self.memory[self.xPos][self.yPos].setVisited()
@@ -263,6 +258,15 @@ class AI:
                 else:
                     print(self.memory[h][j].typeOfTile,end='')
             print()
+
+        if self.doneWithGoals and self.foundGoal and not self.exitPathGenerated:
+            self.pathToExit = genExitPath(self)
+            self.exitPathGenerated = True
+
+        elif self.doneWithGoals and self.exitPathGenerated:
+            if percepts.get('X')[0] == 'r':
+                return ('U', message)
+            return (self.pathToExit.pop(0), message)
 
         if percepts.get('X')[0] in  ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'):
             self.turnsSinceGoal = 0
