@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["-d", "0.001",  "-w", "worlds/world2"],
+            "args": ["-d", "0.001",  "-w", "worlds/world2", "-t", "1000"],
             "purpose": ["debug-in-terminal"]
         }
     ]
