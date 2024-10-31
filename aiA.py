@@ -131,6 +131,7 @@ class AI:
                 #    self.xPos[self.memoryLayer] += (len(msg[0]) - len(self.memory))
             
             self.memory = msg[0]
+            self.layerTile = msg[4]
             for j in range(len(self.xPos)):
                 try:
                     self.xPos[j] += msg[2][j]
@@ -222,7 +223,7 @@ class AI:
             print()
 
         shortestPath = 999
-        message = (self.memory, self.previousChoice, deltaX, deltaY)
+        message = (self.memory, self.previousChoice, deltaX, deltaY, self.layerTile)
 
         if self.doneWithGoals and self.foundGoal and not self.exitPathGenerated:
             self.pathToExit = genExitPath(self)
@@ -263,7 +264,7 @@ class AI:
                     self.memoryLayer = 0
                 return ('U', message)
             else:
-                if (self.memory[0][self.xPos[0]][self.yPos[0]].isVisited() == 0) or (self.memory[0][self.xPos[0]][self.yPos[0]].typeOfTile == self.opposites[percepts.get('X')[0]]):
+                if (self.memory[0][self.xPos[0]][self.yPos[0]].isVisited() == 0) or (self.memory[0][self.xPos[0]][self.yPos[0]].typeOfTile == self.opposites[percepts.get('X')[0]]) and (percepts.get('X')[0] not in self.layerTile):
                     try:
                         self.memoryLayer = self.layerTile[self.memoryLayer][self.layerTile[self.memoryLayer].index(percepts.get('X')[0])+1]
                     except:
@@ -316,12 +317,9 @@ class AI:
                         numTilesInPath += 1
                     i += 1
 
-                if  numTilesInPath > 0:
+                if  numTilesInPath < shortestPath and numTilesInPath > 0:
+                    shortestPath = numTilesInPath
                     choice = direction
-                    self.xPos[self.memoryLayer] += 1
-                    self.backTrackStack.append(choice)
-                    self.previousChoice = choice
-                    return (choice, message)
 
             i = 1
             numTilesInPath = 0

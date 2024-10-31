@@ -7,7 +7,7 @@
 #
 #     In-code comments DO NOT count as a description of
 #     of your approach.
-MAX_TURNS = 150
+MAX_TURNS = 250
 import random
 from collections import deque
 
@@ -49,77 +49,87 @@ class AI:
     def update(self, percepts, msg):
         self.turn += 1
         message = None
+        print("TURN " + str(self.turn))
         if self.turn == 900:
+            print("Last plane out of Saigon!")
             self.doneWithGoals = True
+            self.foundGoal = True
 
 
         def genExitPath(self):
             print("\n\nINITIATING EXIT PATH GENERATION\n\n")
             pathToExit = []
             tempMap = self.memory
+            tempLayer = self.memoryLayer
 
             # Initialize visited status for each tile
-            for sublist in tempMap[self.memoryLayer]:
+            for sublist in tempMap[tempLayer]:
                 for tile in sublist:
                     tile.visited = False
 
-            startX, startY = self.xPos[self.memoryLayer], self.yPos[self.memoryLayer]
+            startX, startY = self.xPos[tempLayer], self.yPos[tempLayer]
             directions = {'N': (0, -1), 'E': (1, 0), 'S': (0, 1), 'W': (-1, 0)}
             queue = deque([(startX, startY, [])])  # Store position and path to reach that position
-            tempMap[self.memoryLayer][startX][startY].visited = True
+            tempMap[tempLayer][startX][startY].visited = True
+
+            ignoreTeleport = False
+
+            for j in range(len(tempMap[tempLayer][0])):
+                    if ignoreTeleport == True:
+                        break
+                    for h in range(len(tempMap[tempLayer])):
+                        if tempMap[tempLayer][h][j].typeOfTile == 'r':
+                            ignoreTeleport = True
+                            break
 
             # Perform BFS
             while queue:
                 x, y, path = queue.popleft()
-
-                for j in range(len(tempMap[self.memoryLayer][0])):
-                    for h in range(len(tempMap[self.memoryLayer])):
+                
+                for j in range(len(tempMap[tempLayer][0])):
+                    for h in range(len(tempMap[tempLayer])):
                         if h == x and j == y:
                             print("#", end='')
-                        elif tempMap[self.memoryLayer][h][j].typeOfTile == 'g':
-                            if tempMap[self.memoryLayer][h][j].visited == 1:
+                        elif tempMap[tempLayer][h][j].typeOfTile == 'g':
+                            if tempMap[tempLayer][h][j].visited == 1:
                                 print('█', end='')
                             else:
                                 print(' ', end='')
                         else:
-                            print(tempMap[self.memoryLayer][h][j].typeOfTile,end='')
+                            print(tempMap[tempLayer][h][j].typeOfTile,end='')
                     print()
 
+                print()
+                print()
                 # Check if we've reached the exit
-                if tempMap[self.memoryLayer][x][y].typeOfTile == 'r':
+                if tempMap[tempLayer][x][y].typeOfTile == 'r':
                     print("FOUND EXIT, RETURNING PATH")
                     pathToExit = path + ['U']
                     return pathToExit
-
+                if not ignoreTeleport:
+                    if tempMap[tempLayer][x][y].typeOfTile in ('y', 'p', 'o', 'b') and (path[-1] != 'U') and (tempLayer != 0):
+                        try:
+                            tempLayer = self.layerTile[0][self.layerTile[0].index(tempMap[tempLayer][x][y].typeOfTile)+1]
+                        except:
+                            tempLayer = self.layerTile[0][self.layerTile[0].index(self.opposites[tempMap[tempLayer][x][y].typeOfTile])+1]
+                        queue.append((self.xPos[tempLayer], self.yPos[tempLayer], path + ['U']))
+                        continue  
                 # Explore neighboring tiles in all directions
                 for direction, (dx, dy) in directions.items():
                     nx, ny = x + dx, y + dy
-
+                    
                     # Check within bounds and for non-wall tiles
-                    if 0 <= nx < len(tempMap[self.memoryLayer]) and 0 <= ny < len(tempMap[self.memoryLayer][0]):
-                        if not tempMap[self.memoryLayer][nx][ny].visited and tempMap[self.memoryLayer][nx][ny].typeOfTile not in {'w', '@'}:
+                    if 0 <= nx < len(tempMap[tempLayer]) and 0 <= ny < len(tempMap[tempLayer][0]):
+                        
+                        if not tempMap[tempLayer][nx][ny].visited and tempMap[tempLayer][nx][ny].typeOfTile not in {'w', '@'}:
                             # Mark as visited and add to queue with updated path
-                            tempMap[self.memoryLayer][nx][ny].visited = True
+                            tempMap[tempLayer][nx][ny].visited = True
                             queue.append((nx, ny, path + [direction]))
 
             # If no path is found, return an empty path
             print("COULD NOT FIND PATH TO EXIT")
             return []
 
-
-        #if msg is not None :
-
-        #   if self.turn == 1:
-        #        self.memory = msg[0]
-
-        #    else:
-
-        #        if len(self.memory[0]) < len(msg[0][0]):
-        #            self.yPos[self.memoryLayer] += (len(msg[0][0]) - len(self.memory[0]))
-        #        if len(self.memory) < len(msg[0]):
-        #            self.xPos[self.memoryLayer] += (len(msg[0]) - len(self.memory))
-        #    
-        #        self.memory = msg[0]
 
         if msg is not None :
             #if self.turn == 1:
@@ -131,6 +141,7 @@ class AI:
                 #    self.xPos[self.memoryLayer] += (len(msg[0]) - len(self.memory))
             
             self.memory = msg[0]
+            self.layerTile = msg[4]
             for j in range(len(self.xPos)):
                 try:
                     self.xPos[j] += msg[2][j]
@@ -139,12 +150,28 @@ class AI:
                     print()
 
 
-        if (self.memory[self.memoryLayer][self.xPos[self.memoryLayer]][self.yPos[self.memoryLayer]].isVisited() == 0):
-            self.memory[self.memoryLayer][self.xPos[self.memoryLayer]][self.yPos[self.memoryLayer]].setVisited()
+
+        #if msg is not None :
+        #    if len(self.memory[0]) < len(msg[0][0]):
+        #        self.yPos[self.memoryLayer] += (len(msg[0][0]) - len(memory[0]))
+        #    if len(self.memory) < len(msg[0]):
+        #        self.xPos[self.memoryLayer] += (len(msg[0]) - len(self.memory))
+        #
+        #    self.memory = msg[0]
+
+        
+
+        
+        if not self.doneWithGoals:
+
+            if (self.memory[self.memoryLayer][self.xPos[self.memoryLayer]][self.yPos[self.memoryLayer]].isVisited() == 0):
+                self.memory[self.memoryLayer][self.xPos[self.memoryLayer]][self.yPos[self.memoryLayer]].setVisited()     
 
         deltaX = [0 for x in range(self.memoryLayer+1)] 
         deltaY = [0 for x in range(self.memoryLayer+1)]
+
         #mapping function -- complete?
+        print("peepeepoopoo")
         for direction, path in percepts.items():
             if direction == 'X':
                 continue
@@ -196,10 +223,6 @@ class AI:
                     tilesOut+=1
             i = 1
 
-        shortestPath = 999
-        message = (self.memory, self.previousChoice, deltaX, deltaY)
-        print("B MAP:")
-        
         for j in range(len(self.memory[self.memoryLayer][0])):
             for h in range(len(self.memory[self.memoryLayer])):
                 if h == self.xPos[self.memoryLayer] and j == self.yPos[self.memoryLayer]:
@@ -210,6 +233,9 @@ class AI:
                     print(self.memory[self.memoryLayer][h][j].typeOfTile,end='')
             print()
 
+        shortestPath = 999
+        message = (self.memory, self.previousChoice, deltaX, deltaY, self.layerTile)
+
         if self.doneWithGoals and self.foundGoal and not self.exitPathGenerated:
             self.pathToExit = genExitPath(self)
             self.exitPathGenerated = True
@@ -217,24 +243,44 @@ class AI:
         if self.doneWithGoals and self.exitPathGenerated:
             if percepts.get('X')[0] == 'r':
                 return ('U', message)
-            return (self.pathToExit.pop(0), message)
+            choice = self.pathToExit.pop(0)
+            if choice == 'N':
+                self.yPos[self.memoryLayer] -= 1
+            if choice == 'E':
+                self.xPos[self.memoryLayer] += 1
+            if choice == 'S':
+                self.yPos[self.memoryLayer] += 1
+            if choice == 'W':
+                self.xPos[self.memoryLayer] -= 1
+            return (choice, message)
 
         if percepts.get('X')[0] in  ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'):
             self.turnsSinceGoal = 0
             return ('U', message)
-        elif percepts.get('X')[0] in ('y', 'p', 'o', 'b'):
+        elif percepts.get('X')[0] in ('y', 'p', 'o', 'b') and (self.previousChoice != 'U'):
             print("TELEPORTER TIMEEEEEEE")
             self.previousChoice = 'U'
-            if ((percepts.get('X')[0] not in self.layerTile) or (self.opposites[percepts.get('X')[0]] not in self.layerTile)):   
-                self.layerTile.append(percepts.get('X')[0])
-                self.layerTile.append(len(self.memory))
-                self.memory.append([[self.TileObj()]])
-                self.memoryLayer = self.layerTile[self.layerTile.index(percepts.get('X')[0])+1]
-                self.xPos[self.memoryLayer].append(0)
-                self.yPos[self.memoryLayer].append(0)
+            if (percepts.get('X')[0] not in self.layerTile[0]):   
+                if(self.opposites[percepts.get('X')[0]] not in self.layerTile[0]):
+                    self.layerTile[self.memoryLayer].append(percepts.get('X')[0])
+                    self.layerTile[self.memoryLayer].append(len(self.memory))
+                    self.layerTile.append([])
+                    self.memory.append([[self.TileObj()]])
+                    self.memoryLayer = self.layerTile[self.memoryLayer][self.layerTile[self.memoryLayer].index(percepts.get('X')[0])+1]
+                    self.xPos.append(0)
+                    self.yPos.append(0)
+                else:
+                    self.layerTile[self.memoryLayer].append(percepts.get('X')[0])
+                    self.layerTile[self.memoryLayer].append(0)
+                    self.memoryLayer = 0
+                return ('U', message)
             else:
-                self.memoryLayer = self.layerTile[self.layerTile.index(percepts.get('X')[0])+1]
-            return ('U', message)
+                if (self.memory[0][self.xPos[0]][self.yPos[0]].isVisited() == 0) or (self.memory[0][self.xPos[0]][self.yPos[0]].typeOfTile == self.opposites[percepts.get('X')[0]]) and (percepts.get('X')[0] not in self.layerTile):
+                    try:
+                        self.memoryLayer = self.layerTile[self.memoryLayer][self.layerTile[self.memoryLayer].index(percepts.get('X')[0])+1]
+                    except:
+                        self.memoryLayer = self.layerTile[self.memoryLayer][self.layerTile[self.memoryLayer].index(self.opposites[percepts.get('X')[0]])+1]
+                    return ('U', message)
         elif percepts.get('X')[0] == 'r':
             self.foundGoal = True
             if self.doneWithGoals == True:
@@ -250,6 +296,7 @@ class AI:
                 choice = 'x'
                 continue
             
+            i = 1
             numTilesInPath = 0
             if direction == 'N':
                 while self.memory[self.memoryLayer][self.xPos[self.memoryLayer]][self.yPos[self.memoryLayer]-i].typeOfTile != 'w':
@@ -281,7 +328,7 @@ class AI:
                         numTilesInPath += 1
                     i += 1
 
-                if numTilesInPath < shortestPath and numTilesInPath > 0:
+                if  numTilesInPath < shortestPath and numTilesInPath > 0:
                     shortestPath = numTilesInPath
                     choice = direction
 
@@ -313,18 +360,14 @@ class AI:
                         self.backTrackStack.append(choice)
                         self.previousChoice = choice
                         return (choice, message)
+
                     if self.memory[self.memoryLayer][self.xPos[self.memoryLayer]-i][self.yPos[self.memoryLayer]].isVisited() == 0:
                         numTilesInPath += 1
                     i += 1
 
-                if numTilesInPath > 0:
+                if numTilesInPath < shortestPath and numTilesInPath > 0:
+                    shortestPath = numTilesInPath
                     choice = direction
-                    self.xPos[self.memoryLayer] -= 1
-                    self.backTrackStack.append(choice)
-                    self.previousChoice = choice
-                    if self.foundGoal == True:
-                            self.exitPath.append(choice)
-                    return (choice, message)
 
                 
         for direction in percepts:
@@ -372,4 +415,3 @@ class AI:
         self.turnsSinceGoal += 1
 
         return (choice, message)
-    
