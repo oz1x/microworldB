@@ -131,11 +131,12 @@ class AI:
                 #    self.xPos[self.memoryLayer] += (len(msg[0]) - len(self.memory))
             
             self.memory = msg[0]
-            try:
-                self.xPos[self.memoryLayer] += msg[2][self.memoryLayer]
-                self.yPos[self.memoryLayer] += msg[3][self.memoryLayer]
-            except:
-                print()
+            for j in range(len(self.xPos)):
+                try:
+                    self.xPos[j] += msg[2][j]
+                    self.yPos[j] += msg[3][j]
+                except:
+                    print()
 
 
         if (self.memory[self.memoryLayer][self.xPos[self.memoryLayer]][self.yPos[self.memoryLayer]].isVisited() == 0):

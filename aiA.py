@@ -131,11 +131,12 @@ class AI:
                 #    self.xPos[self.memoryLayer] += (len(msg[0]) - len(self.memory))
             
             self.memory = msg[0]
-            try:
-                self.xPos[self.memoryLayer] += msg[2][self.memoryLayer]
-                self.yPos[self.memoryLayer] += msg[3][self.memoryLayer]
-            except:
-                print()
+            for j in range(len(self.xPos)):
+                try:
+                    self.xPos[j] += msg[2][j]
+                    self.yPos[j] += msg[3][j]
+                except:
+                    print()
 
 
 
@@ -247,7 +248,7 @@ class AI:
         elif percepts.get('X')[0] in ('y', 'p', 'o', 'b') and (self.previousChoice != 'U'):
             print("TELEPORTER TIMEEEEEEE")
             self.previousChoice = 'U'
-            if (percepts.get('X')[0] not in self.layerTile or self.opposites[percepts.get('X')[0]] not in self.layerTile):   
+            if (percepts.get('X')[0] not in self.layerTile) and (self.opposites[percepts.get('X')[0]] not in self.layerTile):   
                 self.layerTile.append(percepts.get('X')[0])
                 self.layerTile.append(len(self.memory))
                 self.memory.append([[self.TileObj()]])
@@ -256,8 +257,11 @@ class AI:
                 self.yPos.append(0)
                 return ('U', message)
             else:
-                if (self.memory[0][self.xPos[0]][self.yPos[0]].isVisited() == 0):
-                    self.memoryLayer = self.layerTile[self.layerTile.index(percepts.get('X')[0])+1]
+                if (self.memory[0][self.xPos[0]][self.yPos[0]].isVisited() == 0) or (self.memory[0][self.xPos[0]][self.yPos[0]].typeOfTile == self.opposites[percepts.get('X')[0]]):
+                    try:
+                        self.memoryLayer = self.layerTile[self.layerTile.index(percepts.get('X')[0])+1]
+                    except:
+                        self.memoryLayer = self.layerTile[self.layerTile.index(self.opposites[percepts.get('X')[0]])+1]
                     return ('U', message)
         elif percepts.get('X')[0] == 'r':
             self.foundGoal = True
