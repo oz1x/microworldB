@@ -109,6 +109,19 @@ class AI:
             return []
 
 
+        if msg is not None :
+            #if self.turn == 1:
+                #self.memory = msg[0]
+            #else:
+             #   if len(self.memory[0]) < len(msg[0][0]):
+              #      self.yPos += (len(msg[0][0]) - len(self.memory[0]))
+               # if len(self.memory) < len(msg[0]):
+                #    self.xPos += (len(msg[0]) - len(self.memory))
+            
+            self.memory = msg[0]
+            self.xPos += msg[2]
+            self.yPos += msg[3]
+
 
 
         #if msg is not None :
@@ -127,6 +140,9 @@ class AI:
             if (self.memory[self.xPos][self.yPos].isVisited() == 0):
                 self.memory[self.xPos][self.yPos].setVisited()     
 
+        deltaX = 0
+        deltaY = 0
+
         #mapping function -- complete?
         for direction, path in percepts.items():
             if direction == 'X':
@@ -142,6 +158,7 @@ class AI:
                         for sublist in self.memory:
                             sublist.insert(0, self.TileObj())
                         self.yPos += 1
+                        deltaY += 1
                     self.memory[self.xPos][self.yPos-i].typeOfTile = tile
                     tilesOut += 1
                     i += 1
@@ -172,6 +189,7 @@ class AI:
                     if atEdge == 1:
                         self.memory.insert(0, [self.TileObj() for i in range(len(self.memory[0]))])
                         self.xPos += 1
+                        deltaX += 1
                     self.memory[self.xPos-i][self.yPos].typeOfTile = tile
                     i+=1
                     tilesOut+=1
@@ -188,7 +206,7 @@ class AI:
             print()
 
         shortestPath = 999
-        message = (self.memory, self.previousChoice)
+        message = (self.memory, self.previousChoice, deltaX, deltaY)
 
         if self.doneWithGoals and self.foundGoal and not self.exitPathGenerated:
             self.pathToExit = genExitPath(self)
@@ -327,7 +345,13 @@ class AI:
                     self.xPos -= 1
 
         if choice == 'x':
-            choice = self.opposites[self.backTrackStack.pop()]
+            try:
+                choice = self.opposites[self.backTrackStack.pop()]
+            except:
+                print("Can't find anything else, let's get outta here!")
+                self.doneWithGoals = True 
+                self.foundGoal = True
+                choice = 'U'
             if choice == 'N':
                 self.yPos -= 1
             if choice == 'E':

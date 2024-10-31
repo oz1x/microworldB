@@ -121,10 +121,25 @@ class AI:
         #    
         #        self.memory = msg[0]
 
+        if msg is not None :
+            #if self.turn == 1:
+                #self.memory = msg[0]
+            #else:
+             #   if len(self.memory[0]) < len(msg[0][0]):
+              #      self.yPos += (len(msg[0][0]) - len(self.memory[0]))
+               # if len(self.memory) < len(msg[0]):
+                #    self.xPos += (len(msg[0]) - len(self.memory))
+            
+            self.memory = msg[0]
+            self.xPos += msg[2]
+            self.yPos += msg[3]
+
 
         if (self.memory[self.xPos][self.yPos].isVisited() == 0):
             self.memory[self.xPos][self.yPos].setVisited()
 
+        deltaX = 0
+        deltaY = 0
         #mapping function -- complete?
         for direction, path in percepts.items():
             if direction == 'X':
@@ -140,6 +155,7 @@ class AI:
                         for sublist in self.memory:
                             sublist.insert(0, self.TileObj())
                         self.yPos += 1
+                        deltaY += 1
                     self.memory[self.xPos][self.yPos-i].typeOfTile = tile
                     tilesOut += 1
                     i += 1
@@ -170,13 +186,14 @@ class AI:
                     if atEdge == 1:
                         self.memory.insert(0, [self.TileObj() for i in range(len(self.memory[0]))])
                         self.xPos += 1
+                        deltaX += 1
                     self.memory[self.xPos-i][self.yPos].typeOfTile = tile
                     i+=1
                     tilesOut+=1
             i = 1
 
         shortestPath = 999
-        message = (self.memory, self.previousChoice)
+        message = (self.memory, self.previousChoice, deltaX, deltaY)
         print("B MAP:")
         
         for j in range(len(self.memory[0])):
@@ -200,11 +217,11 @@ class AI:
 
         if percepts.get('X')[0] in  ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'):
             self.turnsSinceGoal = 0
-            return ('U', None)
+            return ('U', message)
         elif percepts.get('X')[0] == 'r':
             self.foundGoal = True
             if self.doneWithGoals == True:
-                return ('U', None)
+                return ('U', message)
         elif self.turnsSinceGoal > MAX_TURNS:
             self.doneWithGoals = True
             self.turnsSinceGoal = -999
@@ -224,7 +241,7 @@ class AI:
                         self.yPos -= 1
                         self.backTrackStack.append(choice)
                         self.previousChoice = choice
-                        return (choice, None)
+                        return (choice, message)
                     if self.memory[self.xPos][self.yPos-i].isVisited() == 0:
                         numTilesInPath += 1
                     i += 1
@@ -242,7 +259,7 @@ class AI:
                         self.xPos += 1
                         self.backTrackStack.append(choice)
                         self.previousChoice = choice
-                        return (choice, None)
+                        return (choice, message)
                     if self.memory[self.xPos+i][self.yPos].isVisited() == 0:
                         numTilesInPath += 1
                     i += 1
@@ -260,7 +277,7 @@ class AI:
                         self.yPos += 1
                         self.backTrackStack.append(choice)
                         self.previousChoice = choice
-                        return (choice, None)
+                        return (choice, message)
                     if self.memory[self.xPos][self.yPos+i].isVisited() == 0:
                         numTilesInPath += 1
                     i += 1
@@ -278,7 +295,7 @@ class AI:
                         self.xPos -= 1
                         self.backTrackStack.append(choice)
                         self.previousChoice = choice
-                        return (choice, None)
+                        return (choice, message)
                     if self.memory[self.xPos-i][self.yPos].isVisited() == 0:
                         numTilesInPath += 1
                     i += 1
@@ -290,7 +307,7 @@ class AI:
                     self.previousChoice = choice
                     if self.foundGoal == True:
                             self.exitPath.append(choice)
-                    return (choice, None)
+                    return (choice, message)
 
                 
         for direction in percepts:
@@ -315,7 +332,13 @@ class AI:
                     self.xPos -= 1
 
         if choice == 'x':
-            choice = self.opposites[self.backTrackStack.pop()]
+            try:
+                choice = self.opposites[self.backTrackStack.pop()]
+            except:
+                print("Can't find anything else, let's get outta here!")
+                self.doneWithGoals = True 
+                self.foundGoal = True
+                choice = 'U'
             if choice == 'N':
                 self.yPos -= 1
             if choice == 'E':
@@ -324,7 +347,7 @@ class AI:
                 self.yPos += 1
             if choice == 'W':
                 self.xPos -= 1
-            return (choice, None)
+            return (choice, message)
         
         self.backTrackStack.append(choice)
 
