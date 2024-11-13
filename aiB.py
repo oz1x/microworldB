@@ -69,13 +69,17 @@ class AI:
                     print()
 
 
+        def markVisited(self):
+            try:
+                if (self.memory[self.memoryLayer][self.xPos[self.memoryLayer]][self.yPos[self.memoryLayer]].isVisited() == 0):
+                    self.memory[self.memoryLayer][self.xPos[self.memoryLayer]][self.yPos[self.memoryLayer]].setVisited()
+            except:
+                print("no tile found at memlayer " + str(self.memoryLayer))
         
 
         # Set current tile as visited
         if not self.doneWithGoals:
-
-            if (self.memory[self.memoryLayer][self.xPos[self.memoryLayer]][self.yPos[self.memoryLayer]].isVisited() == 0):
-                self.memory[self.memoryLayer][self.xPos[self.memoryLayer]][self.yPos[self.memoryLayer]].setVisited()     
+            markVisited(self)   
 
         deltaX = [0 for x in range(self.memoryLayer+1)] 
         deltaY = [0 for x in range(self.memoryLayer+1)]
@@ -156,7 +160,13 @@ class AI:
         if self.doneWithGoals and self.exitPathGenerated:
             if percepts.get('X')[0] == 'r':
                 return ('U', message)
-            choice = self.pathToExit.pop(0)
+            try:
+                choice = self.pathToExit.pop(0)
+            except:
+                print("failed to path towards exit. killing self")
+                self.pathToExit = []
+                self.pathToExit = self.genExitPath()
+                return
             if choice == 'N':
                 self.yPos[self.memoryLayer] -= 1
             if choice == 'E':
@@ -167,27 +177,33 @@ class AI:
                 self.xPos[self.memoryLayer] -= 1
             return (choice, message)
 
+        layersDiscovered = 0
+
         # Special conditions if on top of non normal tiles
         # Goals
         if percepts.get('X')[0] in  ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'):
             self.turnsSinceGoal = 0
+            markVisited(self)
             return ('U', message)
+        
         # Teleporters
         elif percepts.get('X')[0] in ('y', 'p', 'o', 'b') and (self.previousChoice != 'U'):
             self.previousChoice = 'U'
-            if (percepts.get('X')[0] not in self.layerTile[0]):   
+            if (percepts.get('X')[0] not in self.layerTile[self.memoryLayer]) and (self.opposites[percepts.get('X')[0]] not in self.layerTile[self.memoryLayer]):   
                 if(self.opposites[percepts.get('X')[0]] not in self.layerTile[0]):
+                    layersDiscovered += 1
                     self.layerTile[self.memoryLayer].append(percepts.get('X')[0])
                     self.layerTile[self.memoryLayer].append(len(self.memory))
                     self.layerTile.append([])
                     self.memory.append([[self.TileObj()]])
-                    self.memoryLayer = self.layerTile[self.memoryLayer][self.layerTile[self.memoryLayer].index(percepts.get('X')[0])+1]
+                    self.memoryLayer = layersDiscovered
                     self.xPos.append(0)
                     self.yPos.append(0)
                 else:
                     self.layerTile[self.memoryLayer].append(percepts.get('X')[0])
                     self.layerTile[self.memoryLayer].append(0)
                     self.memoryLayer = 0
+                markVisited(self)
                 return ('U', message)
             else:
                 if (self.memory[0][self.xPos[0]][self.yPos[0]].isVisited() == 0) or (self.memory[0][self.xPos[0]][self.yPos[0]].typeOfTile == self.opposites[percepts.get('X')[0]]) and (percepts.get('X')[0] not in self.layerTile):
@@ -195,6 +211,7 @@ class AI:
                         self.memoryLayer = self.layerTile[self.memoryLayer][self.layerTile[self.memoryLayer].index(percepts.get('X')[0])+1]
                     except:
                         self.memoryLayer = self.layerTile[self.memoryLayer][self.layerTile[self.memoryLayer].index(self.opposites[percepts.get('X')[0]])+1]
+                    markVisited(self)
                     return ('U', message)
         # Exit
         elif percepts.get('X')[0] == 'r':
@@ -326,13 +343,14 @@ class AI:
                 self.yPos[self.memoryLayer] += 1
             if choice == 'W':
                 self.xPos[self.memoryLayer] -= 1
+            markVisited(self)
             return (choice, message)
         
         self.backTrackStack.append(choice)
 
         self.previousChoice = choice
         self.turnsSinceGoal += 1
-
+        markVisited(self)
         return (choice, message)
     # Function to generate path to exit
     def genExitPath(self):
@@ -399,5 +417,5 @@ class AI:
                         tempMap[tempLayer][nx][ny].visited = True
                         queue.append((nx, ny, path + [direction]))
         # If no path is found, return an empty path
-        print("COULD NOT FIND PATH TO EXIT")
+        print("COULD NOT FIND PATH TO EXIT ON LAYER " + str(tempLayer))
         return []
